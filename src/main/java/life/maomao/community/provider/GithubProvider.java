@@ -22,11 +22,11 @@ public class GithubProvider {
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            String string = response.body().string();
-            String[] split = string.split("&");
-            String tokenStr = split[0];
-            String token = tokenStr.split("=")[1];
-            return token;
+            String urlStr = response.body().string();
+            String[] urlStrArray = urlStr.split("&");
+            String access_tokenStr = urlStrArray[0];
+            String access_token = access_tokenStr.split("=")[1];
+            return access_token;
         }catch (IOException e){ }
         return null;
     }
