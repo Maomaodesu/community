@@ -5,6 +5,7 @@ import life.maomao.community.dto.GithubUser;
 import life.maomao.community.provider.GithubProvider;
 import life.maomao.community.mapper.UserMapper;
 import life.maomao.community.model.User;
+import life.maomao.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -32,13 +33,15 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private String redirectUri;
 
+//    @Autowired
+//    private UserMapper userMapper;
+
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code")String code,
                            @RequestParam(name = "state")String state,
-                           HttpServletRequest request,
                            HttpServletResponse response){
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientID);
@@ -54,9 +57,15 @@ public class AuthorizeController {
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
-            userMapper.insert(user);
+//            user.setGmtCreate(System.currentTimeMillis());
+//            user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatar_url());
+            userService.createOrUpdate(user);
+//            if(userMapper.isUserExist(user) <= 0) {
+//                userMapper.insert(user);
+//            } else{
+//                userMapper.update(user);
+//            }
             // 登录成功，写cookie
             response.addCookie(new Cookie("token",token));
             return "redirect:/";
@@ -64,6 +73,18 @@ public class AuthorizeController {
             // 登陆失败，重新登录
             return "redirect:/";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        //删除session
+        request.getSession().removeAttribute("user");
+        //删除cookie
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
     }
 }
 

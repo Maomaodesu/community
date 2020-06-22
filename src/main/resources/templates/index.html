@@ -5,42 +5,93 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-theme.min.css"/>
-    <script src="js/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/community.css"/>
+    <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/bootstrap.min.js" type="application/javascript"></script>
 </head>
 <body>
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">码匠社区</span>
-                </button>
-                <a class="navbar-brand" href="#">码匠社区</a>
+<div th:insert="~{navigation :: nav}"></div>
+<div class="container-fluid main">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12">
+            <h2><span aria-hidden="true"></span>☭ 人民广场</h2>
+            <hr>
+
+            <!--显示帖子信息-->
+            <div class="media" th:each="topic:${pageInfo.list}">
+                <div class="media-left">
+                    <a href="#">
+                    <!--<img class="media-object img-rounded" th:src="${topicDTO.user.avatarUrl}"></a>-->
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading" th:text="${topic.title}"></h4>
+                    <span th:text="${topic.description}"></span><br>
+                    <span class="text-desc">
+                        <span th:text="${topic.commentCount}"></span> 个回复 ·
+                        <span th:text="${topic.viewCount}"></span> 次浏览 ·
+                        <span th:text="${#dates.format(topic.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </span>
+                </div>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <form class="navbar-form navbar-left">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="搜索文章">
-                    </div>
-                    <button type="submit" class="btn btn-default">搜索</button>
-                </form>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown" th:if="${session.user} != null">
-                        <a th:text="${session.user.getName()}">
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">消息中心</a></li>
-                            <li><a href="#">个人资料</a></li>
-                            <li><a href="#">退出登录</a></li>
-                        </ul>
+
+            <!--显示分页信息-->
+            <div class="modal-footer no-margin-top">
+                <div class="col-md-6">
+                    共 [[${pageInfo.total}]] 条记录
+                </div>
+                <!--首页-->
+                <ul class="pagination pull-right no-margin">
+                    <li th:if="${pageInfo.hasPreviousPage}">
+                        <a th:href="'/?pageNum=1'">首页</a>
                     </li>
-                    <li th:if="${session.user} == null">
-                        <a href="https://github.com/login/oauth/authorize?client_id=53475e89fe52c54fee43&redirect_uri=http://localhost:8887/callback&scope=user&state=1">登录</a>
+                    <!--前页-->
+                    <li class="prev" th:if="${pageInfo.hasPreviousPage}">
+                        <a th:href="'/?pageNum='+${pageInfo.prePage}">
+                            <i class="ace-icon fa fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <!--遍历条数-->
+                    <li th:each="pageNum:${pageInfo.navigatepageNums}">
+                        <a th:href="'/?pageNum='+${pageNum}"
+                           th:text="${pageNum}"
+                           th:if="${pageNum != pageInfo.pageNum}">
+                        </a>
+                        <span style="font-weight: bold;background: #6faed9;"
+                              th:if="${pageNum == pageInfo.pageNum}"
+                              th:text="${pageNum}">
+                        </span>
+                    </li>
+
+                    <li class="next" th:if="${pageInfo.hasNextPage}">
+                        <a th:href="'/?pageNum='+${pageInfo.nextPage}">
+                            <i class="ace-icon fa fa-angle-double-right"></i>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a th:href="'/?pageNum='+${pageInfo.pages}">尾页</a>
                     </li>
                 </ul>
             </div>
+<!--            <div>当前页号：<span th:text="${pageInfo.pageNum}"></span></div>-->
+<!--            <div>每页条数：<span th:text="${pageInfo.pageSize}"></span></div>-->
+<!--            <div>起始行号：<span th:text="${pageInfo.startRow}"></span></div>-->
+<!--            <div>终止行号：<span th:text="${pageInfo.endRow}"></span></div>-->
+<!--            <div>总结果数：<span th:text="${pageInfo.total}"></span></div>-->
+<!--            <div>总页数：<span th:text="${pageInfo.pages}"></span></div>-->
+<!--            <hr />-->
+<!--            <div>是否为第一页：<span th:text="${pageInfo.isFirstPage}"></span></div>-->
+<!--            <div>是否为最后一页：<span th:text="${pageInfo.isLastPage}"></span></div>-->
+<!--            <div>是否有前一页：<span th:text="${pageInfo.hasPreviousPage}"></span></div>-->
+<!--            <div>是否有下一页：<span th:text="${pageInfo.hasNextPage}"></span></div>-->
         </div>
-    </nav>
+
+        <!--右边栏-->
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            <h3>Proletarier aller Länder, vereinigt euch!</h3>
+        </div>
+    </div>
+</div>
 </body>
 </html>

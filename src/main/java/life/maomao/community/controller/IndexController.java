@@ -1,13 +1,13 @@
 package life.maomao.community.controller;
 
-import life.maomao.community.mapper.UserMapper;
-import life.maomao.community.model.User;
+import com.github.pagehelper.PageInfo;
+import life.maomao.community.model.Topic;
+import life.maomao.community.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created by Maomao on 2020/6/14
@@ -16,24 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 public class IndexController {
 
     @Autowired
-    private UserMapper userMapper;
+    private TopicService topicService;
 
     @GetMapping("/")
-    public String index(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null){
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")){
-                    //当cookie生命周期结束后这里就获得不到了，登录已经超时
-                    String token = cookie.getValue();
-                    User user = userMapper.findUserToken(token);
-                    if(user != null){
-                        request.getSession().setAttribute("user",user);
-                    }
-                    break;
-                }
-            }
-        }
+    public String index(Model model,
+                        @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                        @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize){
+//        PageInfo<TopicDTO> pageInfo = topicService.getDefaultTopicList(pageNum, pageSize);
+        PageInfo<Topic> pageInfo = topicService.getDefaultTopicList(pageNum, pageSize);
+        model.addAttribute("pageInfo", pageInfo);
         return "index";
     }
 }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${session}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="/css/community.css"/>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+</head>
+<body>
+<div th:insert="~{navigation :: nav}"></div>
+<div class="container-fluid main">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12">
+            <h2><span th:text="${sectionName}"></span></h2>
+            <hr>
+
+            <!--显示帖子信息-->
+            <div class="media" th:each="topic:${pageInfoOfTopics.list}">
+                <div class="media-left">
+                    <a href="#">
+                        <!--<img class="media-object img-rounded" th:src="${topicDTO.user.avatarUrl}"></a>-->
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only"></span>
+                        </button>
+                        <a class="navbar-brand" th:text="${topic.title}" th:href="'/topic/'+${topic.id}"></a>
+                    </h4>
+                    <span th:text="${topic.description}"></span><br>
+                    <span class="text-desc">
+                        <span th:text="${topic.commentCount}"></span> 个回复 ·
+                        <span th:text="${topic.viewCount}"></span> 次浏览 ·
+                        <span th:text="${#dates.format(topic.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </span>
+                </div>
+            </div>
+
+            <!--显示分页信息-->
+            <div class="modal-footer no-margin-top">
+                <div class="col-md-6">
+                    共 [[${pageInfoOfTopics.total}]] 条记录
+                </div>
+                <!--首页-->
+                <ul class="pagination pull-right no-margin">
+                    <li th:if="${pageInfoOfTopics.hasPreviousPage}">
+                        <a th:href="'/profile/topic?pageNum=1'">首页</a>
+                    </li>
+                    <!--前页-->
+                    <li class="prev" th:if="${pageInfoOfTopics.hasPreviousPage}">
+                        <a th:href="'/profile/topic?pageNum='+${pageInfoOfTopics.prePage}">
+                            <i class="ace-icon fa fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <!--遍历条数-->
+                    <li th:each="pageNum:${pageInfoOfTopics.navigatepageNums}">
+                        <a th:href="'/profile/topic?pageNum='+${pageNum}"
+                           th:text="${pageNum}"
+                           th:if="${pageNum != pageInfoOfTopics.pageNum}">
+                        </a>
+                        <span style="font-weight: bold;background: #6faed9;"
+                              th:if="${pageNum == pageInfoOfTopics.pageNum}"
+                              th:text="${pageNum}">
+                                </span>
+                    </li>
+
+                    <li class="next" th:if="${pageInfoOfTopics.hasNextPage}">
+                        <a th:href="'/profile/topic?pageNum='+${pageInfoOfTopics.nextPage}">
+                            <i class="ace-icon fa fa-angle-double-right"></i>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a th:href="'/profile/topic?pageNum='+${pageInfoOfTopics.pages}">尾页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!--右边栏-->
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                        <h3>Proletarier aller Länder, vereinigt euch!</h3>
+            <div class="list-group section">
+                <a class="list-group-item" href="/profile/topics" th:class="${section=='topics'}?'active':''">
+                    大字报
+                </a>
+                <a href="/profile/replies" th:class="${section=='replies'} ? 'active':''">
+                    <a href="#" class="list-group-item">鸡毛信<span class="badge">14</span></a>
+                </a>
+                <a href="#" class="list-group-item active">
+                    Cras justo odio
+                </a>
+                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                <a href="#" class="list-group-item">Morbi leo risus</a>
+                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                <a href="#" class="list-group-item">Vestibulum at eros</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
