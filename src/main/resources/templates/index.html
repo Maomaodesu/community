@@ -18,19 +18,19 @@
             <hr>
 
             <!--显示帖子信息-->
-            <div class="media" th:each="topic:${pageInfo.list}">
+            <div class="media" th:each="topicOfIndex:${pageInfo.list}">
                 <div class="media-left">
                     <a href="#">
                     <!--<img class="media-object img-rounded" th:src="${topicDTO.user.avatarUrl}"></a>-->
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading" th:text="${topic.title}"></h4>
-                    <span th:text="${topic.description}"></span><br>
+                    <h4 class="media-heading" th:text="${topicOfIndex.title}"></h4>
+                    <span th:text="${topicOfIndex.description}"></span><br>
                     <span class="text-desc">
-                        <span th:text="${topic.commentCount}"></span> 个回复 ·
-                        <span th:text="${topic.viewCount}"></span> 次浏览 ·
-                        <span th:text="${#dates.format(topic.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                        <span th:text="${topicOfIndex.commentCount}"></span> 个回复 ·
+                        <span th:text="${topicOfIndex.viewCount}"></span> 次浏览 ·
+                        <span th:text="${#dates.format(topicOfIndex.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
                     </span>
                 </div>
             </div>

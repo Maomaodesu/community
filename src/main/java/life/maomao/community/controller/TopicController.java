@@ -14,7 +14,7 @@ public class TopicController {
     private TopicService topicService;
 
     @GetMapping("/topic/{id}")
-    public String toipc(@PathVariable(name = "id")Integer id,
+    public String topic(@PathVariable(name = "id")Long id,
                         Model model){
         TopicDTO topicDTO = topicService.getTopicDTOByTopicId(id);
         model.addAttribute("topicDTO", topicDTO);

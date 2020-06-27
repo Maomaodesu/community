@@ -5,14 +5,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import life.maomao.community.dto.TopicDTO;
 import life.maomao.community.mapper.TopicMapper;
+import life.maomao.community.mapper.TopicSelectAllMapper;
 import life.maomao.community.mapper.UserMapper;
 import life.maomao.community.model.Topic;
+import life.maomao.community.model.TopicExample;
 import life.maomao.community.model.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,44 +25,72 @@ public class TopicService {
     private TopicMapper topicMapper;
 
     @Autowired
+    private TopicSelectAllMapper topicSelectAllMapper;
+
+    @Autowired
     private UserMapper userMapper;
 
-//    public PageInfo<TopicDTO> getDefaultTopicList(Integer page, Integer size) {
+    //首页分页
     public PageInfo<Topic> getDefaultTopicList(Integer pageNum, Integer pageSize) {
+        TopicExample topicExample = new TopicExample();
         PageHelper.startPage(pageNum,pageSize);
-        List<Topic> topics = topicMapper.getDefaultTopicList();
-//        List<TopicDTO> topicDTOList = new ArrayList<>();
-//        for (Topic topic : topics) {
-//            System.out.println(topic);
-//            User user = userMapper.findById(topic.getCreatorId());
-//            TopicDTO topicDTO = new TopicDTO();
-//            //把topic COPY到 topicDTO
-//            BeanUtils.copyProperties(topic,topicDTO);
-//            topicDTO.setUser(user);
-//            topicDTOList.add(topicDTO);
-//        }
-//        PageInfo<TopicDTO> pageInfo = new PageInfo<>(topicDTOList);
-        PageInfo<Topic> pageInfo = new PageInfo<>(topics);
-//        System.out.println("当前页: "+pageInfo.getPageNum());
-//        System.out.println("每页显示条数: "+pageInfo.getPageSize());
-//        System.out.println("上一页: "+pageInfo.getPrePage());
+        List<Topic> topicList = topicMapper.selectByExampleWithBLOBs(topicExample);
+        PageInfo<Topic> pageInfo = new PageInfo<>(topicList);
         return pageInfo;
     }
 
-    public PageInfo<Topic> getDefaultTopicListByUserId(Integer id, Integer pageNum, Integer pageSize) {
+    //我的发帖分页
+    public PageInfo<Topic> getDefaultTopicListByUserId(Integer userId, Integer pageNum, Integer pageSize) {
+        TopicExample topicExample = new TopicExample();
+        topicExample.createCriteria()
+                .andCreatorIdEqualTo(userId);
         PageHelper.startPage(pageNum,pageSize);
-        List<Topic> topics = topicMapper.getDefaultTopicListByUserId(id);
-        PageInfo<Topic> pageInfo = new PageInfo<>(topics);
-        return pageInfo;
+        List<Topic> topicList = topicMapper.selectByExampleWithBLOBs(topicExample);
+        if(topicList.size() != 0) {
+            PageInfo<Topic> pageInfo = new PageInfo<>(topicList);
+            return pageInfo;
+        } else {
+            return null;
+        }
     }
 
-
-    public TopicDTO getTopicDTOByTopicId(Integer id) {
-        Topic topic = topicMapper.getTopicByTopicId(id);
-        User user = userMapper.getUserByUserId(topic.getCreatorId());
+    public TopicDTO getTopicDTOByTopicId(Long id) {
+        Topic topic = topicMapper.selectByPrimaryKey(id);
+        User user = userMapper.selectByPrimaryKey(topic.getCreatorId());
         TopicDTO topicDTO = new TopicDTO();
-        BeanUtils.copyProperties(topic,topicDTO);
+        BeanUtils.copyProperties(topic, topicDTO);
         topicDTO.setUser(user);
         return topicDTO;
+    }
+
+    public void createOrUpdate(Topic topic) {
+        TopicExample topicExampleForSelect  = new TopicExample();
+        topicExampleForSelect.createCriteria()
+                .andIdEqualTo(topic.getId());
+
+        List<Topic> topicInDBList = topicMapper.selectByExample(topicExampleForSelect);
+        if(topicInDBList.size() != 0){
+            //创建时间
+            topic.setGmtCreate(System.currentTimeMillis());
+            //修改时间
+            topic.setGmtModified(topic.getGmtCreate());
+            topicMapper.insert(topic);
+        } else {
+            Topic topicInDB = topicInDBList.get(0);
+            Topic UpdateTopicInDB = new Topic();
+            //修改时间
+            UpdateTopicInDB.setGmtModified(System.currentTimeMillis());
+            //主题贴头
+            UpdateTopicInDB.setTitle(topic.getTitle());
+            //主题贴内容
+            UpdateTopicInDB.setDescription(topic.getDescription());
+            //主题标签
+            UpdateTopicInDB.setTag(topic.getTag());
+            TopicExample topicExampleForUpdate = new TopicExample();
+            topicExampleForUpdate.createCriteria()
+                    .andIdEqualTo(topicInDB.getId());
+            topicMapper.updateByExampleSelective(UpdateTopicInDB,topicExampleForUpdate);
+        }
+
     }
 }

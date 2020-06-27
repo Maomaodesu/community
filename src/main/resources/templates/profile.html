@@ -18,7 +18,7 @@
             <hr>
 
             <!--显示帖子信息-->
-            <div class="media" th:each="topic:${pageInfoOfTopics.list}">
+            <div class="media" th:each="topicOfProfile:${pageInfoOfTopics.getList()}">
                 <div class="media-left">
                     <a href="#">
                         <!--<img class="media-object img-rounded" th:src="${topicDTO.user.avatarUrl}"></a>-->
@@ -29,13 +29,13 @@
                         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                             <span class="sr-only"></span>
                         </button>
-                        <a class="navbar-brand" th:text="${topic.title}" th:href="'/topic/'+${topic.id}"></a>
+                        <a class="navbar-brand" th:text="${topicOfProfile.title}" th:href="'/topic/'+${topicOfProfile.id}"></a>
                     </h4>
-                    <span th:text="${topic.description}"></span><br>
+                    <span th:text="${topicOfProfile.description}"></span><br>
                     <span class="text-desc">
-                        <span th:text="${topic.commentCount}"></span> 个回复 ·
-                        <span th:text="${topic.viewCount}"></span> 次浏览 ·
-                        <span th:text="${#dates.format(topic.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                        <span th:text="${topicOfProfile.commentCount}"></span> 个回复 ·
+                        <span th:text="${topicOfProfile.viewCount}"></span> 次浏览 ·
+                        <span th:text="${#dates.format(topicOfProfile.gmtCreate,'yyyy-MM-dd HH:mm:ss')}"></span>
                     </span>
                 </div>
             </div>
