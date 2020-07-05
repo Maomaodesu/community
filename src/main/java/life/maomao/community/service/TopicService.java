@@ -1,11 +1,12 @@
 package life.maomao.community.service;
 
-
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import life.maomao.community.dto.TopicDTO;
+import life.maomao.community.exception.CustomizeErrorCode;
+import life.maomao.community.exception.CustomizeException;
+import life.maomao.community.mapper.TopicExtMapper;
 import life.maomao.community.mapper.TopicMapper;
-import life.maomao.community.mapper.TopicSelectAllMapper;
 import life.maomao.community.mapper.UserMapper;
 import life.maomao.community.model.Topic;
 import life.maomao.community.model.TopicExample;
@@ -25,11 +26,10 @@ public class TopicService {
     private TopicMapper topicMapper;
 
     @Autowired
-    private TopicSelectAllMapper topicSelectAllMapper;
-
-    @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private TopicExtMapper topicExtMapper;
     //首页分页
     public PageInfo<Topic> getDefaultTopicList(Integer pageNum, Integer pageSize) {
         TopicExample topicExample = new TopicExample();
@@ -56,6 +56,9 @@ public class TopicService {
 
     public TopicDTO getTopicDTOByTopicId(Long id) {
         Topic topic = topicMapper.selectByPrimaryKey(id);
+        if(topic == null){ //跳转到一个不存在的帖子（可能之前存在）
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         User user = userMapper.selectByPrimaryKey(topic.getCreatorId());
         TopicDTO topicDTO = new TopicDTO();
         BeanUtils.copyProperties(topic, topicDTO);
@@ -89,8 +92,20 @@ public class TopicService {
             TopicExample topicExampleForUpdate = new TopicExample();
             topicExampleForUpdate.createCriteria()
                     .andIdEqualTo(topicInDB.getId());
-            topicMapper.updateByExampleSelective(UpdateTopicInDB,topicExampleForUpdate);
+            int updated = topicMapper.updateByExampleSelective(UpdateTopicInDB,topicExampleForUpdate);
+            if(updated != 1){//在更新的时候跳转到一个不存在的帖子（可能之前存在）
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
+    }
 
+    //查看浏览次数
+    public void incView(Long id) {
+        Topic topic = new Topic();
+        topic.setId(id);
+        topic.setViewCount(1);
+        topicExtMapper.incView(topic);
     }
 }
+
+

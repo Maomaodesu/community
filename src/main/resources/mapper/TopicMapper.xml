@@ -445,6 +445,7 @@
     -->
     update topic
     set title = #{title,jdbcType=VARCHAR},
+    set title = #{title,jdbcType=VARCHAR},
       gmt_create = #{gmtCreate,jdbcType=BIGINT},
       gmt_modified = #{gmtModified,jdbcType=BIGINT},
       creator_id = #{creatorId,jdbcType=INTEGER},

@@ -17,6 +17,7 @@ public class TopicController {
     public String topic(@PathVariable(name = "id")Long id,
                         Model model){
         TopicDTO topicDTO = topicService.getTopicDTOByTopicId(id);
+        topicService.incView(id);
         model.addAttribute("topicDTO", topicDTO);
         return "topic";
     }

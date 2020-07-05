@@ -2,7 +2,6 @@ package life.maomao.community.controller;
 
 import life.maomao.community.dto.TopicDTO;
 import life.maomao.community.mapper.TopicMapper;
-import life.maomao.community.mapper.UserMapper;
 import life.maomao.community.model.Topic;
 import life.maomao.community.model.User;
 import life.maomao.community.service.TopicService;
@@ -23,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class PublishController {
 
-    @Autowired
-    private TopicMapper topicMapper;
     @Autowired
     private TopicService topicService;
 
