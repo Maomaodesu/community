@@ -6,16 +6,34 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="gmt_create" jdbcType="BIGINT" property="gmtCreate" />
     <result column="gmt_modified" jdbcType="BIGINT" property="gmtModified" />
-    <result column="creator_id" jdbcType="INTEGER" property="creatorId" />
-    <result column="comment_count" jdbcType="INTEGER" property="commentCount" />
-    <result column="view_count" jdbcType="INTEGER" property="viewCount" />
-    <result column="like_count" jdbcType="INTEGER" property="likeCount" />
-    <result column="dislike_count" jdbcType="INTEGER" property="dislikeCount" />
+    <result column="creator_id" jdbcType="BIGINT" property="creatorId" />
+    <result column="comment_count" jdbcType="BIGINT" property="commentCount" />
+    <result column="view_count" jdbcType="BIGINT" property="viewCount" />
+    <result column="like_count" jdbcType="BIGINT" property="likeCount" />
+    <result column="dislike_count" jdbcType="BIGINT" property="dislikeCount" />
     <result column="tag" jdbcType="VARCHAR" property="tag" />
   </resultMap>
   <update id="incView" parameterType="map">
     update topic
     set view_count = view_count + #{viewCount,jdbcType=INTEGER}
+    where id = #{id}
+  </update>
+
+  <update id="incCommentCount" parameterType="map">
+    update topic
+    set comment_count = comment_count + #{commentCount,jdbcType=INTEGER}
+    where id = #{id}
+  </update>
+
+  <update id="incLike" parameterType="map">
+    update topic
+    set like_count = like_count + #{likeCount,jdbcType=INTEGER}
+    where id = #{id}
+  </update>
+
+  <update id="incDisLike" parameterType="map">
+    update topic
+    set dislike_count = dislike_count + #{dislikeCount,jdbcType=INTEGER}
     where id = #{id}
   </update>
 </mapper>

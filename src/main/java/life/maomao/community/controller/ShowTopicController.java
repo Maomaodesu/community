@@ -8,8 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * 展示主题贴
+ * Created by Maomao on 2020/6/14
+ */
 @Controller
-public class TopicController {
+public class ShowTopicController {
     @Autowired
     private TopicService topicService;
 
@@ -17,8 +21,10 @@ public class TopicController {
     public String topic(@PathVariable(name = "id")Long id,
                         Model model){
         TopicDTO topicDTO = topicService.getTopicDTOByTopicId(id);
-        topicService.incView(id);
+        topicService.incView(id);//浏览数
         model.addAttribute("topicDTO", topicDTO);
         return "topic";
     }
+
+//    @GetMapping("/topic")
 }

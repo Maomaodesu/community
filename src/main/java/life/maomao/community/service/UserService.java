@@ -24,7 +24,7 @@ public class UserService {
             user.setGmtCreate(System.currentTimeMillis());
             //修改时间
             user.setGmtModified(user.getGmtCreate());
-            userMapper.insert(user);
+            userMapper.insertSelective(user);
         } else { //拿到数据库中有的user对象userInDB，更新这个对象
             User userInDB = userInDBList.get(0);
             User UpdateUserInDB = new User();

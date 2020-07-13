@@ -21,7 +21,6 @@ import java.util.List;
  */
 @Service
 public class TopicService {
-//放弃查询发帖用户头像
     @Autowired
     private TopicMapper topicMapper;
 
@@ -30,7 +29,7 @@ public class TopicService {
 
     @Autowired
     private TopicExtMapper topicExtMapper;
-    //首页分页
+    //首页帖子分页
     public PageInfo<Topic> getDefaultTopicList(Integer pageNum, Integer pageSize) {
         TopicExample topicExample = new TopicExample();
         PageHelper.startPage(pageNum,pageSize);
@@ -40,10 +39,10 @@ public class TopicService {
     }
 
     //我的发帖分页
-    public PageInfo<Topic> getDefaultTopicListByUserId(Integer userId, Integer pageNum, Integer pageSize) {
+    public PageInfo<Topic> getDefaultTopicListByUserId(Long userId, Integer pageNum, Integer pageSize) {
         TopicExample topicExample = new TopicExample();
         topicExample.createCriteria()
-                .andCreatorIdEqualTo(userId);
+                .andCreatorIdEqualTo(Long.valueOf(userId));
         PageHelper.startPage(pageNum,pageSize);
         List<Topic> topicList = topicMapper.selectByExampleWithBLOBs(topicExample);
         if(topicList.size() != 0) {
@@ -54,10 +53,11 @@ public class TopicService {
         }
     }
 
+    //点击帖子进入
     public TopicDTO getTopicDTOByTopicId(Long id) {
         Topic topic = topicMapper.selectByPrimaryKey(id);
-        if(topic == null){ //跳转到一个不存在的帖子（可能之前存在）
-            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        if(topic == null){ //帖子被删了
+            throw new CustomizeException(CustomizeErrorCode.TOPIC_NOT_FOUND);
         }
         User user = userMapper.selectByPrimaryKey(topic.getCreatorId());
         TopicDTO topicDTO = new TopicDTO();
@@ -66,45 +66,84 @@ public class TopicService {
         return topicDTO;
     }
 
+    //新建或更新帖子
     public void createOrUpdate(Topic topic) {
-        TopicExample topicExampleForSelect  = new TopicExample();
-        topicExampleForSelect.createCriteria()
-                .andIdEqualTo(topic.getId());
-
-        List<Topic> topicInDBList = topicMapper.selectByExample(topicExampleForSelect);
-        if(topicInDBList.size() != 0){
+        //如果id = null，说明是新建的主题，补全这个主题的初始信息并执行创建，否则说明是修改的主题
+        if(topic.getId() == null){
             //创建时间
             topic.setGmtCreate(System.currentTimeMillis());
             //修改时间
             topic.setGmtModified(topic.getGmtCreate());
-            topicMapper.insert(topic);
-        } else {
-            Topic topicInDB = topicInDBList.get(0);
-            Topic UpdateTopicInDB = new Topic();
-            //修改时间
-            UpdateTopicInDB.setGmtModified(System.currentTimeMillis());
-            //主题贴头
-            UpdateTopicInDB.setTitle(topic.getTitle());
-            //主题贴内容
-            UpdateTopicInDB.setDescription(topic.getDescription());
-            //主题标签
-            UpdateTopicInDB.setTag(topic.getTag());
-            TopicExample topicExampleForUpdate = new TopicExample();
-            topicExampleForUpdate.createCriteria()
-                    .andIdEqualTo(topicInDB.getId());
-            int updated = topicMapper.updateByExampleSelective(UpdateTopicInDB,topicExampleForUpdate);
-            if(updated != 1){//在更新的时候跳转到一个不存在的帖子（可能之前存在）
-                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            //浏览数
+            topic.setViewCount((long) 0);
+            //评论数
+            topic.setCommentCount((long) 0);
+            //点赞数
+            topic.setLikeCount((long) 0);
+            //点踩数
+            topic.setViewCount((long) 0);
+
+            //执行创建
+            topicMapper.insertSelective(topic);
+        } else { //帖子存在，则更新内容
+            //在数据库中根据这个id进行查找
+            TopicExample topicExampleForSelect  = new TopicExample();
+            topicExampleForSelect.createCriteria()
+                    .andIdEqualTo(topic.getId());
+            //根据id定位帖子
+            List<Topic> topicInDBList = topicMapper.selectByExample(topicExampleForSelect);
+            if (topicInDBList.size() == 0) {
+                //这个时候帖子被删了
+                throw new CustomizeException(CustomizeErrorCode.TOPIC_NOT_FOUND);
+            } else {
+                Topic topicInDB = topicInDBList.get(0);
+                //创建修改的那条数据所对应的对象
+                Topic UpdateTopicInDB = new Topic();
+                //更新修改时间
+                UpdateTopicInDB.setGmtModified(System.currentTimeMillis());
+                //更新主题贴头
+                UpdateTopicInDB.setTitle(topic.getTitle());
+                //更新主题贴内容
+                UpdateTopicInDB.setDescription(topic.getDescription());
+                //更新主题标签
+                System.out.println(topic.getTag());
+                UpdateTopicInDB.setTag(topic.getTag());
+
+                //执行更新
+                TopicExample topicExampleForUpdate = new TopicExample();
+                topicExampleForUpdate.createCriteria()
+                        .andIdEqualTo(topicInDB.getId());
+                int update = topicMapper.updateByExampleSelective(UpdateTopicInDB, topicExampleForUpdate);
+                //如果更新失败（比如更新的时候这帖子被删了），跳转到不存在该贴
+                if (update != 1) {
+                    throw new CustomizeException(CustomizeErrorCode.TOPIC_NOT_FOUND);
+                }
             }
         }
     }
 
-    //查看浏览次数
+    //浏览次数
     public void incView(Long id) {
         Topic topic = new Topic();
         topic.setId(id);
-        topic.setViewCount(1);
+        topic.setViewCount((long) 1);
         topicExtMapper.incView(topic);
+    }
+
+    //点赞次数
+    public void incLike(Long id) {
+        Topic topic = new Topic();
+        topic.setId(id);
+        topic.setLikeCount((long) 1);
+        topicExtMapper.incLike(topic);
+    }
+
+    //点踩次数
+    public void incDisLike(Long id) {
+        Topic topic = new Topic();
+        topic.setId(id);
+        topic.setDislikeCount((long) 1);
+        topicExtMapper.incDisLike(topic);
     }
 }
 

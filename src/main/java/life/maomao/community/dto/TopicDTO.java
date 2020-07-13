@@ -8,11 +8,11 @@ public class TopicDTO {
     private String description;
     private Long gmtCreate;
     private Long gmtModified;
-    private Integer creatorId = 0;
-    private Integer commentCount = 0;
-    private Integer viewCount = 0;
-    private Integer likeCount = 0;
-    private Integer dislikeCount = 0;
+    private Long creatorId;
+    private Long commentCount;
+    private Long viewCount;
+    private Long likeCount;
+    private Long dislikeCount;
     private String tag;
     private User user;
 
@@ -56,43 +56,43 @@ public class TopicDTO {
         this.gmtModified = gmtModified;
     }
 
-    public Integer getCreatorId() {
+    public Long getCreatorId() {
         return creatorId;
     }
 
-    public void setCreatorId(Integer creatorId) {
+    public void setCreatorId(Long creatorId) {
         this.creatorId = creatorId;
     }
 
-    public Integer getCommentCount() {
+    public Long getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(Integer commentCount) {
+    public void setCommentCount(Long commentCount) {
         this.commentCount = commentCount;
     }
 
-    public Integer getViewCount() {
+    public Long getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(Integer viewCount) {
+    public void setViewCount(Long viewCount) {
         this.viewCount = viewCount;
     }
 
-    public Integer getLikeCount() {
+    public Long getLikeCount() {
         return likeCount;
     }
 
-    public void setLikeCount(Integer likeCount) {
+    public void setLikeCount(Long likeCount) {
         this.likeCount = likeCount;
     }
 
-    public Integer getDislikeCount() {
+    public Long getDislikeCount() {
         return dislikeCount;
     }
 
-    public void setDislikeCount(Integer dislikeCount) {
+    public void setDislikeCount(Long dislikeCount) {
         this.dislikeCount = dislikeCount;
     }
 

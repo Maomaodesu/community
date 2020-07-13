@@ -1,7 +1,6 @@
 package life.maomao.community.controller;
 
 import life.maomao.community.dto.TopicDTO;
-import life.maomao.community.mapper.TopicMapper;
 import life.maomao.community.model.Topic;
 import life.maomao.community.model.User;
 import life.maomao.community.service.TopicService;
@@ -17,14 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 发主题帖
  * Created by Maomao on 2020/6/17
  */
 @Controller
-public class PublishController {
+public class PublishTopicController {
 
     @Autowired
     private TopicService topicService;
 
+    //根据id获取当前的topic然后回显，写到publish页面上
     @GetMapping("/publish/{id}")
     public String edit(@PathVariable(name = "id") Long id,
                        Model model){
@@ -36,11 +37,13 @@ public class PublishController {
         return "publish";
     }
 
+    //点击发布跳转到发布页面
     @GetMapping("/publish")
     public String publish(){
         return "publish";
     }
 
+    //点击页面上发布按钮，执行发布
     @PostMapping("/publish")
     public String doPublish(
             @RequestParam(value = "title", required = false) String title,
@@ -49,7 +52,6 @@ public class PublishController {
             @RequestParam(value = "id", required = false) Long id,
             HttpServletRequest request,
             Model model){
-
         model.addAttribute("title",title);
         model.addAttribute("description",description);
         model.addAttribute("tag",tag);
@@ -73,14 +75,14 @@ public class PublishController {
             return "publish";
         }
 
+        //新建主题，填写内容信息，初始化信息在service层
         Topic topic = new Topic();
+        topic.setId(id);//如果是修改，则会从publish/id里拿到id，否则是新建，id为空
         topic.setTitle(title);
         topic.setDescription(description);
         topic.setTag(tag);
+        System.out.println(topic.getTag());
         topic.setCreatorId(user.getId());
-        topic.setGmtCreate(System.currentTimeMillis());
-        topic.setGmtModified(topic.getGmtCreate());
-        topic.setId(id);
         topicService.createOrUpdate(topic);
         return "redirect:/";
     }

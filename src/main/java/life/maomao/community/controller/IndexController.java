@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
+ * 首页展示
  * Created by Maomao on 2020/6/14
  */
 @Controller

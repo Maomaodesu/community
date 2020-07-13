@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 /**
+ * 身份校验
  * Created By Maomao on 2020/6/15
  */
 @Controller
@@ -57,15 +58,8 @@ public class AuthorizeController {
             user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-//            user.setGmtCreate(System.currentTimeMillis());
-//            user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatar_url());
             userService.createOrUpdate(user);
-//            if(userMapper.isUserExist(user) <= 0) {
-//                userMapper.insert(user);
-//            } else{
-//                userMapper.update(user);
-//            }
             // 登录成功，写cookie
             response.addCookie(new Cookie("token",token));
             return "redirect:/";

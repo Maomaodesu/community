@@ -8,4 +8,10 @@ import java.util.List;
 
 public interface TopicExtMapper {
     int incView(Topic record);
+
+    int incCommentCount(Topic record);
+
+    int incLike(Topic record);
+
+    int incDisLike(Topic record);
 }
